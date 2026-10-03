@@ -1,0 +1,31 @@
+# Shared Python dependencies for all modules (Python 3.11).
+# Pin versions when a module is first built; left unpinned here during scaffolding.
+
+# --- Decoy content layer (Modules 4, 6) ---
+asyncssh
+fastapi
+uvicorn[standard]
+httpx                 # engine -> Ollama, async HTTP
+
+# --- Consistency store (Module 5) ---
+# sqlite3 is stdlib; no package needed.
+
+# --- Attacker / recon agent (Modules 7, 8) ---
+python-nmap
+paramiko
+requests
+pyyaml
+
+# --- RAG / retrieval (Module 4) ---
+# Prefer Ollama embeddings to avoid a heavy torch pull on first build;
+# add sentence-transformers only if needed.
+# sentence-transformers
+
+# --- Evaluation (Section 13) ---
+pandas
+scipy
+matplotlib
+jupyter
+
+# --- Topology cGAN (stretch, Module 3) ---
+# torch   # uncomment only if the cGAN stretch goal is attempted

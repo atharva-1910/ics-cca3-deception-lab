@@ -1,0 +1,32 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Store / runtime state (snapshots are tracked; live DB is not)
+store/*.db
+store/*.sqlite
+store/*.sqlite3
+
+# Experiment outputs — raw logs are regenerated, never hand-edited.
+# Keep the directory layout, ignore bulk run artifacts.
+results/**/*.jsonl
+results/**/*.transcript
+results/**/transcript*
+results/**/report.json
+results/**/ground_truth.json
+!results/**/.gitkeep
+
+# Generated topology / compose overrides
+topology.json
+docker-compose.override.yml
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Keep the docx handover out of diffs only if large churn; keep it tracked for now.
