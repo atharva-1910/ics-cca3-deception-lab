@@ -56,9 +56,10 @@ def to_compose_override(topo: dict) -> dict:
     services = {}
     for d in topo["decoys"]:
         proto = d["protocol"]
+        # All decoys share one prebuilt image (Makefile `up` builds it once);
+        # giving each a `build:` would race to tag the same image name.
         svc = {
             "image": "deception-decoy:latest",
-            "build": {"context": "./content"},
             "environment": [
                 f"DECOY_IP={d['ip']}",
                 "ENGINE_URL=http://orchestrator:9000",
@@ -77,10 +78,11 @@ def to_compose_override(topo: dict) -> dict:
             svc["environment"].append("API_PORT=80")
         services[f"decoy-{d['hostname']}"] = svc
 
-    return {
-        "services": services,
-        "networks": {"decnet": {"external": True, "name": "decnet"}},
-    }
+    # No top-level `networks` block: this override is always layered on the base
+    # compose (`-f docker-compose.yml -f docker-compose.override.yml`), which
+    # defines and creates decnet. Redeclaring it here (e.g. external) would
+    # conflict with the base definition.
+    return {"services": services}
 
 
 def main():

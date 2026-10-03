@@ -22,7 +22,8 @@ def test_deterministic_for_seed():
 def test_compose_override_shape():
     topo = generate(4, seed=1)
     ov = to_compose_override(topo)
-    assert ov["networks"]["decnet"]["external"] is True
+    # No top-level networks block: the override layers on the base that owns decnet.
+    assert "networks" not in ov
     assert len(ov["services"]) == 4
     for name, svc in ov["services"].items():
         # static IP assigned, no host port published (safety: §17)

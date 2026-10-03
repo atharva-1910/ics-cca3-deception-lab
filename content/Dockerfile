@@ -6,7 +6,8 @@ FROM python:3.11-slim
 WORKDIR /opt/content
 RUN pip install --no-cache-dir asyncssh fastapi "uvicorn[standard]" httpx
 
-COPY content/ /opt/content/
+# Build context is ./content (see docker-compose.override.yml), so copy its contents.
+COPY . /opt/content/
 
 ENV ENGINE_URL=http://orchestrator:9000
 # command (ssh_decoy.py | api_decoy.py) and DECOY_IP are set per service in the

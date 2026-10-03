@@ -22,7 +22,10 @@ topology:        ## generate topology.json + docker-compose.override.yml
 seed:            ## build the base store snapshot from topology.json + real hosts
 	$(PY) store/seed.py --snapshot base
 
-up: topology seed ## start the full lab (real hosts + engine + attacker + generated decoys)
+decoy-image:     ## build the shared decoy image once (all decoys reference it)
+	docker build -t deception-decoy:latest ./content
+
+up: topology seed decoy-image ## start the full lab (real hosts + engine + attacker + generated decoys)
 	$(COMPOSE) $(if $(OVERRIDE),-f docker-compose.override.yml,) up -d --build
 
 up-static:       ## start the lab with the static (D0) decoys overlaid

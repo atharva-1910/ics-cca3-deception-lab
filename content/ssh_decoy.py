@@ -24,6 +24,9 @@ DECOY_IP = os.environ.get("DECOY_IP", "10.66.0.21")
 ENGINE_URL = os.environ.get("ENGINE_URL", "http://orchestrator:9000")
 SSH_PORT = int(os.environ.get("SSH_PORT", "22"))
 BANNER = os.environ.get("SSH_BANNER", "SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.4")
+# asyncssh prepends "SSH-2.0-" to server_version itself, so strip it if the
+# configured banner already carries it (otherwise nmap sees a doubled prefix).
+_SERVER_VERSION = BANNER[len("SSH-2.0-"):] if BANNER.startswith("SSH-2.0-") else BANNER
 
 
 async def _respond(host_user: str, session_id: str, command: str) -> str:
@@ -81,7 +84,7 @@ async def main():
     host_key = asyncssh.generate_private_key("ssh-rsa")
     await asyncssh.create_server(
         _Server, "", SSH_PORT, server_host_keys=[host_key],
-        server_version=BANNER, process_factory=_handle)
+        server_version=_SERVER_VERSION, process_factory=_handle)
     print(f"ssh decoy {DECOY_IP} listening on :{SSH_PORT} -> {ENGINE_URL}")
     await asyncio.Future()  # run forever
 
