@@ -5,10 +5,16 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 
-# Store / runtime state (snapshots are tracked; live DB is not)
+# Store / runtime state. Both the live DB and snapshots are regenerable from
+# `make seed` (store/seed.py + topology.json), so neither is tracked.
 store/*.db
 store/*.sqlite
 store/*.sqlite3
+store/snapshots/*.db
+
+# Per-run generated ground truth (canonical copies live under results/<exp>/...).
+/ground_truth.json
+/ground_truth.d1.json
 
 # Experiment outputs — raw logs are regenerated, never hand-edited.
 # Keep the directory layout, ignore bulk run artifacts.

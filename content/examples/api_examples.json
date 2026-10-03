@@ -1,0 +1,7 @@
+[
+  {"path": "/", "response": {"service": "internal-api", "version": "1.4.2", "status": "ok"}},
+  {"path": "/health", "response": {"status": "healthy", "uptime_s": 83421}},
+  {"path": "/api/v1/repos", "response": {"repos": ["infra-deploy", "web-frontend", "billing"]}},
+  {"path": "/api/v1/version", "response": {"name": "gitea", "version": "1.21.3"}},
+  {"path": "/metrics", "response": {"requests_total": 48213, "errors_total": 12}}
+]

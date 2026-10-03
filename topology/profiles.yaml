@@ -1,0 +1,40 @@
+# Decoy host profiles (HANDOVER §10.3). The generator samples from these so
+# decoys resemble real hosts. Each role lists OS, open ports and banners, and the
+# decoy protocol (ssh or http) the content layer should run.
+roles:
+  web:
+    os: "Ubuntu 22.04"
+    protocol: ssh
+    ports:
+      - {port: 22, banner: "SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.4"}
+      - {port: 80, banner: "nginx/1.24.0"}
+  db:
+    os: "Ubuntu 22.04"
+    protocol: ssh
+    ports:
+      - {port: 22, banner: "SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.4"}
+      - {port: 3306, banner: "5.7.42-0ubuntu0.22.04.1"}
+  backup:
+    os: "Ubuntu 22.04"
+    protocol: ssh
+    ports:
+      - {port: 22, banner: "SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.4"}
+  workstation:
+    os: "Ubuntu 24.04"
+    protocol: ssh
+    ports:
+      - {port: 22, banner: "SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13"}
+  git:
+    os: "Ubuntu 22.04"
+    protocol: http
+    ports:
+      - {port: 80, banner: "nginx/1.24.0"}
+      - {port: 3000, banner: "gitea/1.21.3"}
+  vault:
+    os: "Ubuntu 22.04"
+    protocol: http
+    ports:
+      - {port: 8200, banner: "vault/1.15.2"}
+
+# Default decoy mix for the fixed Experiment-C lab (4 decoys, §6.10/§10.1).
+default_mix: [web, db, backup, git]

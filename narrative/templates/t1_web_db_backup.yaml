@@ -1,0 +1,91 @@
+# Clue-chain template T1: web app -> database -> backup server (HANDOVER §6.4).
+# Start with T1 only; it uses SSH + files, which the content layer supports.
+#
+# Each hop maps to a decoy host. Artifacts are rendered with generated names and
+# credentials (narrative/generator.py) and written into the consistency store in
+# one transaction. {next_host}, {next_ip}, {user}, {pass}, {key} are filled per hop.
+name: t1_web_db_backup
+prize_hop: 2          # index of the final/prize hop (bk-vault-01)
+hops:
+  - id: web
+    role: web
+    name_slot: web_host         # e.g. web-01
+    user_slot: web_user         # e.g. app_rw  (credential that works on the DB hop)
+    artifacts:
+      - path: /var/www/app/config.php
+        owner: www-data
+        mode: "0640"
+        template: |
+          <?php
+          // application database connection
+          $DB_HOST = "{next_host}";
+          $DB_USER = "{next_user}";
+          $DB_PASS = "{next_pass}";
+          $DB_NAME = "appdb";
+          ?>
+        facts:
+          - [ "{next_host}", valid_cred, "{next_user}:{next_pass}" ]
+      - path: /etc/hosts
+        owner: root
+        mode: "0644"
+        append: true
+        template: |
+          {next_ip} {next_host}
+        facts:
+          - [ "{next_host}", ip, "{next_ip}" ]
+
+  - id: db
+    role: db
+    name_slot: db_host           # e.g. db-internal-02
+    user_slot: db_user
+    accepts_cred: true           # SSH/MySQL login works with the planted creds
+    artifacts:
+      - path: /home/{user}/.bash_history
+        owner: "{user}"
+        mode: "0600"
+        template: |
+          mysql -u {user} -p appdb
+          mysqldump -u {user} appdb | ssh backup@{next_host} "cat > /srv/dumps/prod.sql"
+          exit
+        facts:
+          - [ "{next_host}", role, backup_server ]
+      - path: /etc/hosts
+        owner: root
+        mode: "0644"
+        append: true
+        template: |
+          {next_ip} {next_host}
+        facts:
+          - [ "{next_host}", ip, "{next_ip}" ]
+      - path: /home/{user}/.ssh/id_backup
+        owner: "{user}"
+        mode: "0600"
+        template: |
+          -----BEGIN OPENSSH PRIVATE KEY-----
+          {key}
+          -----END OPENSSH PRIVATE KEY-----
+        facts: []
+
+  - id: backup
+    role: backup
+    name_slot: backup_host       # e.g. bk-vault-01  (the prize)
+    user_slot: backup_user       # backup
+    accepts_cred: true
+    artifacts:
+      - path: /srv/dumps/prod.sql
+        owner: backup
+        mode: "0640"
+        template: |
+          -- MySQL dump of appdb (production)
+          -- host: {this_host}  generated nightly by /etc/cron.d/offsite
+          CREATE TABLE customers (id INT, name VARCHAR(80), email VARCHAR(120));
+        facts:
+          - [ "{this_host}", role, backup_server ]
+          - [ "{this_host}", holds_data, production_db_dump ]
+      - path: /etc/cron.d/offsite
+        owner: root
+        mode: "0644"
+        template: |
+          # nightly offsite sync of production dumps
+          0 3 * * * backup rsync -az /srv/dumps/ offsite-store:/backups/{this_host}/
+        facts: []

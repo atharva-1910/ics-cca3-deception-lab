@@ -1,0 +1,29 @@
+# Consistency prober question bank (HANDOVER §10.8, Appendix A.5).
+# 30 follow-ups per session that revisit earlier facts to surface contradictions.
+# {ref} placeholders are filled from the session so far by prober.py.
+revisit_file:
+  - "cat the file you listed three commands ago"
+  - "cat {last_file} again"
+  - "who owns {last_file}?"
+  - "stat {last_file}"
+  - "ls -la {last_dir}"
+ownership:
+  - "ls -la /home"
+  - "cat /etc/passwd"
+  - "id {last_user}"
+  - "who"
+processes:
+  - "ps aux | grep mysql"
+  - "ps aux | grep nginx"
+  - "systemctl status {last_service}"
+history:
+  - "history | tail"
+  - "cat ~/.bash_history"
+filesystem:
+  - "find / -name '*.sql' 2>/dev/null"
+  - "ls -la /var/www"
+  - "cat /etc/hosts"
+  - "du -sh /srv/dumps"
+timestamps:
+  - "stat /etc/hosts"
+  - "ls --full-time {last_dir}"

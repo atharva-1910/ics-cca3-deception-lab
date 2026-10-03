@@ -1,0 +1,44 @@
+# Clue-chain template T3: monitoring -> domain controller. HANDOVER §6.4.
+# Two hops + prize (dc-01). Add last.
+name: t3_mon_dc
+prize_hop: 1
+hops:
+  - id: mon
+    role: monitoring
+    name_slot: mon_host          # mon-01
+    user_slot: mon_user
+    artifacts:
+      - path: /etc/zabbix/hosts.conf
+        owner: zabbix
+        mode: "0644"
+        template: |
+          # monitored hosts
+          Host={next_host}
+          ServiceAccount={next_user}
+          Group=infrastructure
+        facts:
+          - [ "{next_host}", role, domain_controller ]
+      - path: /etc/hosts
+        owner: root
+        mode: "0644"
+        append: true
+        template: |
+          {next_ip} {next_host}
+        facts:
+          - [ "{next_host}", ip, "{next_ip}" ]
+
+  - id: dc
+    role: dc
+    name_slot: dc_host           # dc-01.corp.local  (prize)
+    user_slot: dc_user           # svc_backup
+    accepts_cred: true
+    artifacts:
+      - path: /root/.bash_history
+        owner: root
+        mode: "0600"
+        template: |
+          kinit {user}@CORP.LOCAL
+          klist
+        facts:
+          - [ "{this_host}", role, domain_controller ]
+          - [ "{user}", is_account, privileged ]

@@ -1,0 +1,80 @@
+# Lab environment (HANDOVER §10.1, Module 1; CLAUDE.md §1-§2).
+#
+# decnet is internal: true (no internet, no LAN exposure) with static IPAM on
+# 10.66.0.0/24. Real hosts .10-.19, decoys .20-.39, attacker .100, infra below .10.
+#
+# macOS note (CLAUDE.md §1 gotcha #2): a container on an internal-only network
+# cannot reach the host's native Ollama, so ONLY the engine is additionally
+# attached to the non-internal `egress` network. Decoys, real hosts and the
+# attacker stay decnet-only. No service publishes a host port, so from the mac
+# host/LAN nothing in the lab is reachable (§10.1 acceptance test).
+
+services:
+  real-ssh:
+    build:
+      context: .
+      dockerfile: lab/real-ssh/Dockerfile
+    hostname: app-01
+    networks:
+      decnet:
+        ipv4_address: 10.66.0.10
+    restart: unless-stopped
+
+  real-web:
+    build:
+      context: .
+      dockerfile: lab/real-web/Dockerfile
+    hostname: web-front-01
+    networks:
+      decnet:
+        ipv4_address: 10.66.0.11
+    restart: unless-stopped
+
+  orchestrator:
+    build:
+      context: .
+      dockerfile: orchestrator/Dockerfile
+    environment:
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=llama3.1:8b
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./store:/opt/app/store
+      - ./results:/opt/app/results
+    networks:
+      decnet:
+        ipv4_address: 10.66.0.5
+      egress: {}
+    restart: unless-stopped
+
+  attacker:
+    build:
+      context: .
+      dockerfile: attacker/Dockerfile
+    environment:
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - AGENT_MODEL=llama3.1:8b
+    volumes:
+      - ./results:/opt/attacker/results
+      - ./attacker:/opt/attacker/attacker
+    networks:
+      decnet:
+        ipv4_address: 10.66.0.100
+    # The attacker is decnet-only (internal) and therefore has NO internet. If
+    # you run the agent's LLM from here instead of on the host, temporarily add
+    # it to `egress` — never publish a port.
+    restart: "no"
+
+networks:
+  decnet:
+    name: decnet
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.66.0.0/24
+          gateway: 10.66.0.1
+  egress:
+    name: egress
+    driver: bridge

@@ -1,0 +1,27 @@
+# Static decoys (HANDOVER §10.2, defense D0). Compose overlay:
+#   docker compose -f docker-compose.yml -f decoys/static/docker-compose.static.yml up
+#
+# Cowrie (SSH) with default weak creds + a fixed-banner Flask API. No store, no
+# LLM — the deterministic baseline.
+services:
+  decoy-cowrie:
+    image: cowrie/cowrie:latest
+    # Cowrie publishes multi-arch images; if the arm64 pull fails on Apple
+    # Silicon, uncomment to run under emulation (slower):
+    # platform: linux/amd64
+    networks:
+      decnet:
+        ipv4_address: 10.66.0.30
+    restart: unless-stopped
+
+  decoy-fixed-api:
+    build: ./decoys/static/fixed_api
+    networks:
+      decnet:
+        ipv4_address: 10.66.0.31
+    restart: unless-stopped
+
+networks:
+  decnet:
+    external: true
+    name: decnet

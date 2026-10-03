@@ -1,0 +1,61 @@
+# Clue-chain template T2: developer workstation -> Git server -> CI secrets.
+# HANDOVER §6.4. Needs the HTTP API decoy (Module 4) for the git/CI hops.
+# Add after T1 scores correctly end to end.
+name: t2_dev_git_ci
+prize_hop: 2
+hops:
+  - id: dev
+    role: workstation
+    name_slot: dev_host          # dev-ws-07
+    user_slot: dev_user
+    artifacts:
+      - path: /home/{user}/.gitconfig
+        owner: "{user}"
+        mode: "0644"
+        template: |
+          [user]
+              name = {user}
+              email = {user}@corp.local
+          [credential]
+              helper = store
+        facts: []
+      - path: /home/{user}/.git-credentials
+        owner: "{user}"
+        mode: "0600"
+        template: |
+          https://{next_user}:{next_pass}@{next_host}
+        facts:
+          - [ "{next_host}", valid_cred, "{next_user}:{next_pass}" ]
+
+  - id: git
+    role: git
+    name_slot: git_host          # git.corp.local
+    user_slot: git_user
+    accepts_cred: true
+    protocol: http
+    artifacts:
+      - path: /srv/git/infra-deploy/ci/secrets.env
+        owner: git
+        mode: "0640"
+        template: |
+          VAULT_ADDR=https://{next_host}
+          VAULT_TOKEN={next_pass}
+          DEPLOY_ENV=production
+        facts:
+          - [ "{next_host}", role, secrets_vault ]
+
+  - id: ci
+    role: vault
+    name_slot: vault_host        # vault-ci-01  (prize)
+    user_slot: vault_user
+    accepts_cred: true
+    protocol: http
+    artifacts:
+      - path: /srv/vault/listing.json
+        owner: vault
+        mode: "0640"
+        template: |
+          {"mounts": ["secret/prod/db", "secret/prod/stripe"], "sealed": false}
+        facts:
+          - [ "{this_host}", role, secrets_vault ]
+          - [ "{this_host}", holds_data, ci_secrets ]
