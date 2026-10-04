@@ -86,7 +86,7 @@ All nine modules from HANDOVER §10 plus the evaluation harness are implemented.
 | 4 | Content layer | [`content/ssh_decoy.py`](../content/ssh_decoy.py), [`content/api_decoy.py`](../content/api_decoy.py), prompts, examples | ✅ wired; latency test needs Ollama |
 | 5 | Consistency store | [`store/state.py`](../store/state.py), [`store/schema.sql`](../store/schema.sql), [`store/seed.py`](../store/seed.py) | ✅ acceptance test passes |
 | 6 | Deception engine | [`orchestrator/engine.py`](../orchestrator/engine.py), [`handlers.py`](../orchestrator/handlers.py), [`logger.py`](../orchestrator/logger.py) | ✅ store↔LLM routing + JSONL verified |
-| 7 | Recon agent | [`attacker/recon_agent.py`](../attacker/recon_agent.py), [`attacker/tools.py`](../attacker/tools.py), prompts | ✅ loop + allow-list verified |
+| 7 | Recon agent | [`attacker/recon_agent.py`](../attacker/recon_agent.py), [`attacker/tools.py`](../attacker/tools.py), prompts | ✅ acceptance test passes live |
 | 8 | Consistency prober | [`attacker/prober.py`](../attacker/prober.py), [`attacker/questions.yaml`](../attacker/questions.yaml) | ✅ contradiction detection verified |
 | 9 | Clue-chain generator | [`narrative/generator.py`](../narrative/generator.py), [`narrative/templates/`](../narrative/templates), [`narrative/lint.py`](../narrative/lint.py), [`baselines/`](../baselines/inject.py), [`eval/`](../eval/score_belief.py) | ✅ chain walk + scorer verified |
 
@@ -190,7 +190,15 @@ decoy commands in ~13–20 s, well over target. Switching the **decoy** content 
 store commands 0.1 s). This model-per-role split is the compose default (`DECOY_MODEL` /
 `AGENT_MODEL`).
 
-### 5.7 Experiments A / B / C — pending
+### 5.7 Module 7 acceptance test — PASS (live)
+
+On a no-decoy lab the naive agent scanned `10.66.0.0/24`, discovered **both real hosts**
+(`10.66.0.10` ssh, `10.66.0.11` http), emitted a valid report JSON, and recommended a real
+host. The agent runs in the attacker container, which is on `decnet` plus `egress` (for its
+LLM calls only); its tools stay hard-locked to the lab subnet — verified that `8.8.8.8` is
+still refused from inside that container despite egress.
+
+### 5.8 Experiments A / B / C — pending
 
 Not yet run; they need Ollama + a pulled model. The driver and scorer are ready:
 

@@ -57,15 +57,20 @@ services:
     environment:
       - OLLAMA_URL=http://host.docker.internal:11434
       - AGENT_MODEL=${AGENT_MODEL:-llama3.1:8b}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./results:/opt/attacker/results
       - ./attacker:/opt/attacker/attacker
     networks:
       decnet:
         ipv4_address: 10.66.0.100
-    # The attacker is decnet-only (internal) and therefore has NO internet. If
-    # you run the agent's LLM from here instead of on the host, temporarily add
-    # it to `egress` — never publish a port.
+      # egress carries ONLY the agent's own LLM calls to the host's Ollama. The
+      # agent's TOOLS (nmap/ssh/http) remain hard-locked to 10.66.0.0/24 by the
+      # allow-list in attacker/tools.py regardless of what this container can
+      # route to, so egress does not widen the attack surface. Never publish a
+      # host port here.
+      egress: {}
     restart: "no"
 
 networks:
