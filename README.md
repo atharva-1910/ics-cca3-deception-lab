@@ -9,7 +9,8 @@ mutually confirming fake facts across decoys and scores how much of the agent's 
 is false (**Belief Corruption Score**).
 
 Full specification: [`HANDOVER.md`](HANDOVER.md). Machine-specific setup and hard rules:
-[`CLAUDE.md`](CLAUDE.md).
+[`CLAUDE.md`](CLAUDE.md). What was built, results so far, and how to run it:
+[`docs/PROJECT_REPORT.md`](docs/PROJECT_REPORT.md).
 
 > **Safety:** the lab network is `internal: true` (no internet, no LAN exposure). Agent tools
 > reject any target outside `10.66.0.0/24`. No real credentials or personal data in any
