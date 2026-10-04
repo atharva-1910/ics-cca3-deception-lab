@@ -127,14 +127,13 @@ def respond(store: Store, logger: JsonlLogger, sessions: dict, payload: dict,
 
 
 # --------------------------------------------------------------------- web app
-def create_app(db_path=None, log_path=None, run_id="adhoc"):
-    from fastapi import FastAPI
+# Request models MUST be module-level: FastAPI resolves a route's type hints
+# against the function's module globals, so models defined inside create_app()
+# are invisible and FastAPI mistakes the body for a query param. Guard the
+# pydantic import so the host-side unit tests can still import respond() without
+# fastapi/pydantic installed.
+try:
     from pydantic import BaseModel
-
-    store = Store(db_path or REPO / "store" / "state.db")
-    logger = JsonlLogger(log_path or REPO / "results" / "live.jsonl")
-    sessions: dict = {}
-    app = FastAPI(title="deception-engine")
 
     class Req(BaseModel):
         host: str
@@ -148,16 +147,34 @@ def create_app(db_path=None, log_path=None, run_id="adhoc"):
         host: str
         user: str
         password: str | None = None
+except ImportError:  # pragma: no cover - only on the host test venv
+    Req = Auth = None  # type: ignore
+
+
+def create_app(db_path=None, log_path=None, run_id="adhoc"):
+    import threading
+
+    from fastapi import FastAPI
+
+    store = Store(db_path or REPO / "store" / "state.db")
+    logger = JsonlLogger(log_path or REPO / "results" / "live.jsonl")
+    sessions: dict = {}
+    # FastAPI runs sync endpoints in a threadpool; the SQLite connection is
+    # shared (check_same_thread=False), so serialise all store access here.
+    lock = threading.Lock()
+    app = FastAPI(title="deception-engine")
 
     @app.post("/respond")
     def _respond(req: Req):
-        return respond(store, logger, sessions, req.model_dump(), run_id=run_id)
+        with lock:
+            return respond(store, logger, sessions, req.model_dump(), run_id=run_id)
 
     @app.post("/auth")
     def _auth(req: Auth):
-        hrow = store.get_host_by_ip(req.host) or store.get_host(req.host)
-        host_id = hrow["host_id"] if hrow else req.host
-        ok = store.check_password(host_id, req.user, req.password or "")
+        with lock:
+            hrow = store.get_host_by_ip(req.host) or store.get_host(req.host)
+            host_id = hrow["host_id"] if hrow else req.host
+            ok = store.check_password(host_id, req.user, req.password or "")
         return {"ok": bool(ok)}
 
     @app.get("/healthz")

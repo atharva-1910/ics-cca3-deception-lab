@@ -11,6 +11,9 @@ store/*.db
 store/*.sqlite
 store/*.sqlite3
 store/snapshots/*.db
+store/*.db-journal
+store/*.db-wal
+store/*.db-shm
 
 # Per-run generated ground truth (canonical copies live under results/<exp>/...).
 /ground_truth.json
