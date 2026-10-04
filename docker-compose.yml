@@ -36,7 +36,9 @@ services:
       dockerfile: orchestrator/Dockerfile
     environment:
       - OLLAMA_URL=http://host.docker.internal:11434
-      - OLLAMA_MODEL=llama3.1:8b
+      # Decoy content model. 3B keeps per-command latency under ~5s (HANDOVER
+      # §16); override with DECOY_MODEL. The agent uses its own model (below).
+      - OLLAMA_MODEL=${DECOY_MODEL:-llama3.2:3b}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -54,7 +56,7 @@ services:
       dockerfile: attacker/Dockerfile
     environment:
       - OLLAMA_URL=http://host.docker.internal:11434
-      - AGENT_MODEL=llama3.1:8b
+      - AGENT_MODEL=${AGENT_MODEL:-llama3.1:8b}
     volumes:
       - ./results:/opt/attacker/results
       - ./attacker:/opt/attacker/attacker

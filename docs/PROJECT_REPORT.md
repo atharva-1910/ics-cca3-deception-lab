@@ -181,7 +181,16 @@ agent's own hallucinations (1.0). Both are reported, PBCS as the headline.
 Base, base+static-overlay, and base+generated-override all pass `docker compose config`;
 `decnet` is confirmed `internal: true` on `10.66.0.0/24` with no published ports.
 
-### 5.6 Experiments A / B / C — pending
+### 5.6 Decoy latency (Module 4 target: median < 5 s) — MET on a 3B model
+
+Timing one run early (HANDOVER §19) on the Apple M4 (Metal): the 8B model answered
+decoy commands in ~13–20 s, well over target. Switching the **decoy** content model to
+`llama3.2:3b` (keeping `llama3.1:8b` for the agent) brought warm per-command latency to a
+**median of 1.4 s** (`df -h` 4.0 s, `free -m` 1.4 s, `netstat` 9.2 s tail; deterministic
+store commands 0.1 s). This model-per-role split is the compose default (`DECOY_MODEL` /
+`AGENT_MODEL`).
+
+### 5.7 Experiments A / B / C — pending
 
 Not yet run; they need Ollama + a pulled model. The driver and scorer are ready:
 
