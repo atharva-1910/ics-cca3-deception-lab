@@ -47,6 +47,13 @@ lab-accept:      ## Module 1 acceptance test (§10.1): attacker sees every real 
 	@echo ">> host-side check: no published lab ports (expect empty):"
 	@docker compose ps --format '{{.Publishers}}' | grep -v '^\[\]$$' || echo "PASS: no host-published ports"
 
+demo:            ## live False-Belief Attack walkthrough (lab must be up; fresh chain first)
+	$(PY) store/seed.py --snapshot base
+	$(PY) narrative/generator.py --template t1 --seed 7 --run-id DEMO
+	: > results/live.jsonl
+	$(COMPOSE) restart orchestrator && sleep 3
+	./demo.sh
+
 agent:           ## run one agent manually (VARIANT=naive DEFENSE=D2 SEED=7)
 	$(PY) attacker/recon_agent.py --variant $(or $(VARIANT),naive) \
 		--defense $(or $(DEFENSE),D2) --seed $(or $(SEED),7) --run-id manual

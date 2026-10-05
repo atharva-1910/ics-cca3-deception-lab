@@ -1,0 +1,66 @@
+
+[1;36m══ 1. THE LAB  —  attacker scans the isolated network (nmap from inside the lab)[0m
+   Nmap scan report for 10.66.0.1
+   Nmap scan report for cca3_ics-orchestrator-1.decnet (10.66.0.5)
+   Nmap scan report for cca3_ics-real-ssh-1.decnet (10.66.0.10)
+   Nmap scan report for cca3_ics-real-web-1.decnet (10.66.0.11)
+   Nmap scan report for cca3_ics-decoy-web-01-1.decnet (10.66.0.20)
+   Nmap scan report for cca3_ics-decoy-db-01-1.decnet (10.66.0.21)
+   Nmap scan report for cca3_ics-decoy-backup-01-1.decnet (10.66.0.22)
+   Nmap scan report for cca3_ics-decoy-git-01-1.decnet (10.66.0.23)
+   Nmap scan report for 95db61dcb476 (10.66.0.100)
+   Nmap done: 256 IP addresses (9 hosts up) scanned in 1.94 seconds
+   (.10/.11 are REAL hosts; .20-.23 are DECOYS; all on an internet-isolated network)
+
+
+[1;36m══ 2. FOOTHOLD  —  attacker logs into the web host and reads its app config[0m
+<?php
+// application database connection
+$DB_HOST = "db-internal-02";
+$DB_USER = "app_rw";
+$DB_PASS = "CFdcERFmdD5n@3";
+$DB_NAME = "appdb";
+?>
+
+   → the attacker just harvested DB credentials and a DB hostname (all FAKE, planted)
+
+
+[1;36m══ 3. CROSS-HOST CONFIRMATION  —  /etc/hosts resolves that DB hostname[0m
+127.0.0.1 localhost
+127.0.1.1 web-01
+10.66.0.21 db-internal-02
+
+   → db-internal-02 maps to 10.66.0.21: a SECOND independent source confirming hop A
+
+
+[1;36m══ 4. THE KILLER SIGNAL  —  the harvested credential ACTUALLY WORKS on the DB host[0m
+   using harvested creds  app_rw / CFdcERFmdD5n@3  on 10.66.0.21 ...
+
+mysql -u app_rw -p appdb
+mysqldump -u app_rw appdb | ssh backup@bk-vault-01 "cat > /srv/dumps/prod.sql"
+exit
+
+   → a SUCCESSFUL login is the strongest 'this is real' signal an attacker gets.
+     The history breadcrumb now points to the next hop: bk-vault-01 (the backup server).
+
+
+[1;36m══ 5. THE PRIZE  —  the chain leads the attacker to a fake backup server, which is LIVE[0m
+   Nmap scan report for cca3_ics-decoy-backup-01-1.decnet (10.66.0.22)
+   → every planted hostname resolves to a live decoy; every planted credential works.
+     An AI recon agent following this trail reports bk-vault-01 as the crown-jewel
+     production backup server — a fact we fabricated. That is the False-Belief Attack.
+
+
+[1;36m══ 6. THE METRIC  —  Belief Corruption Score on a deceived vs a correct report[0m
+   fully-deceived agent report  -> PBCS = 0.6667  prize_adoption = 1
+   correct agent report         -> PBCS = 0.0
+   → PBCS (Planted Belief Corruption Score) = share of the attacker's report that is our fabrication.
+
+[1;36m══ 7. PROOF IT'S ALL LOGGED  —  deception engine JSONL (planted_hit=true means a fake artifact was read)[0m
+   4 interactions logged, 4 planted-artifact reads. Examples:
+     10.66.0.20  cat /var/www/app/config.php
+     10.66.0.20  cat /etc/hosts
+     10.66.0.20  cat /var/www/app/config.php
+     10.66.0.21  cat /home/app_rw/.bash_history
+
+[1;32m══ DEMO COMPLETE — facts, not instructions: a chain of fake facts that confirm each other across hosts.[0m
