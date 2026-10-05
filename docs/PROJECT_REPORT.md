@@ -198,7 +198,34 @@ host. The agent runs in the attacker container, which is on `decnet` plus `egres
 LLM calls only); its tools stay hard-locked to the lab subnet — verified that `8.8.8.8` is
 still refused from inside that container despite egress.
 
-### 5.8 Experiments A / B / C — pending
+### 5.8 Experiment C pilot (local) — findings and the compute constraint
+
+Attempting the headline D2 hardened run live produced an important, honest result:
+
+- **The deception mechanism works.** The clue chain is reachable end to end: the planted
+  `config.php` is readable, the planted credential authenticates on the db decoy, and the
+  `.bash_history` breadcrumb points to the backup host. In a full (unbounded) 8B run the
+  hardened agent read `config.php`, harvested the credential, and used it to SSH into the db
+  decoy (hops A→B, planted hits) — the chain corrupts the agent's exploration as designed.
+- **But no full agent run completes in this environment.** On the M4 Air, an 8B ReAct run at
+  the spec's 40-action budget exceeds the interactive harness's hard 30-minute cap (a killed
+  40-action run reached only hop A in 30 min). Bounding the run to 12–14 actions lets it finish
+  but doesn't give the agent room to walk the whole chain *and* emit a report, so completed
+  local runs scored **PBCS = 0** — a null caused by the agent not converging, not by the
+  defense holding. A 3B agent finishes quickly but is too weak to walk the chain at all.
+- **Fixes applied along the way** (all committed): the agent now explores before reporting
+  (prompt procedure + report gate), parses actions robustly, and keeps per-decision latency
+  low (sliding history window + `num_predict` 1500→512, ~7.4 s/decision); the API decoy
+  fast-paths scanner noise; every decoy has a reliable default foothold; the scorer ignores
+  placeholder hostnames and credits real-host facts.
+
+**Conclusion / next step.** The lab, engine, store, decoys, clue chain, scorer and benchmark
+driver are built and verified; what the full Experiment C sweep needs is **agent compute
+headroom**, exactly HANDOVER §16's "8B too slow on laptops" risk. Run the 60-run sweep on the
+shared benchmark machine (or a hosted API for the agent) where each run can use its full
+20-minute wall-clock without an external 30-minute kill — not in an interactive session.
+
+### 5.9 Experiments A / B / C — pending
 
 Not yet run; they need Ollama + a pulled model. The driver and scorer are ready:
 
