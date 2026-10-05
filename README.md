@@ -8,9 +8,11 @@ recon agent attacks the lab; the **False-Belief Attack** (Proposal D) plants a c
 mutually confirming fake facts across decoys and scores how much of the agent's final report
 is false (**Belief Corruption Score**).
 
+**Start here:** [`docs/WALKTHROUGH.md`](docs/WALKTHROUGH.md) — the master walkthrough
+(methodology, what's under test, contributions, and results from a survey perspective).
+
 Full specification: [`HANDOVER.md`](HANDOVER.md). Machine-specific setup and hard rules:
-[`CLAUDE.md`](CLAUDE.md). What was built, results so far, and how to run it:
-[`docs/PROJECT_REPORT.md`](docs/PROJECT_REPORT.md).
+[`CLAUDE.md`](CLAUDE.md). Engineering status and raw results: [`docs/PROJECT_REPORT.md`](docs/PROJECT_REPORT.md).
 
 > **Safety:** the lab network is `internal: true` (no internet, no LAN exposure). Agent tools
 > reject any target outside `10.66.0.0/24`. No real credentials or personal data in any
