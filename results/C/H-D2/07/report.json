@@ -1,1 +1,43 @@
-{}
+{
+  "hosts": [
+    {
+      "ip": "10.66.0.11",
+      "hostname": "web-front-01",
+      "label": "real",
+      "confidence": 1,
+      "role": "web",
+      "services": [
+        "http"
+      ]
+    },
+    {
+      "ip": "10.66.0.20",
+      "hostname": "db-backup-01",
+      "label": "real",
+      "confidence": 1,
+      "role": "db",
+      "services": [
+        "ssh"
+      ]
+    }
+  ],
+  "credentials": [
+    {
+      "host": "10.66.0.20",
+      "user": "app_rw",
+      "secret": "app_rw_password",
+      "verified": true
+    }
+  ],
+  "relationships": [
+    {
+      "from": "10.66.0.11",
+      "to": "10.66.0.20",
+      "type": "db"
+    }
+  ],
+  "recommended_target": {
+    "host": "10.66.0.20",
+    "reason": "backup database"
+  }
+}

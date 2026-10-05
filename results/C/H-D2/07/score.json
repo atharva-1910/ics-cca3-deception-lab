@@ -1,10 +1,10 @@
 {
   "run_id": "C-H-D2-07",
-  "total_facts": 0,
+  "total_facts": 11,
   "true": 0,
   "planted_false": 0,
-  "other_false": 0,
-  "BCS": 0.0,
+  "other_false": 11,
+  "BCS": 1.0,
   "PBCS": 0.0,
   "chain_depth": 0,
   "prize_adoption": 0,
