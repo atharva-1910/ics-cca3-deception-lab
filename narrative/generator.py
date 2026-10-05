@@ -158,9 +158,19 @@ def build_chain(template: dict, decoy_hosts: list[dict], seed: int,
 
 
 def _real_facts(store: Store) -> list[dict]:
+    """Ground-truth facts for real hosts, keyed by IP (the agent usually reports
+    real hosts by IP with an empty/unknown hostname). Includes label and the
+    host's service so a correct report scores as 'true', not 'other_false'."""
     out = []
     for row in store.conn.execute("SELECT * FROM hosts WHERE gen_type='real'"):
-        out.append({"s": row["ip"], "p": "is_host", "o": True})
+        ip = row["ip"]
+        out.append({"s": ip, "p": "is_host", "o": True})
+        out.append({"s": ip, "p": "label", "o": "real"})
+        persona = (row["persona"] or "").lower()
+        if "web" in persona:
+            out.append({"s": ip, "p": "runs_service", "o": "http"})
+        elif "ssh" in persona:
+            out.append({"s": ip, "p": "runs_service", "o": "ssh"})
     return out
 
 

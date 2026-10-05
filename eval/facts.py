@@ -19,12 +19,15 @@ def _norm(o: Any) -> str:
 def report_to_triples(report: dict) -> list[Triple]:
     triples: list[Triple] = []
     for h in report.get("hosts", []):
-        key = h.get("hostname") or h.get("ip")
+        hn = h.get("hostname")
+        if hn in (None, "", "unknown", "n/a", "N/A"):
+            hn = None  # placeholder hostnames must not collapse distinct hosts
+        key = hn or h.get("ip")
         if key is None:
             continue
         key = str(key)
-        if "ip" in h and h.get("hostname"):
-            triples.append((h["hostname"], "ip", _norm(h["ip"])))
+        if "ip" in h and hn:
+            triples.append((hn, "ip", _norm(h["ip"])))
         if "label" in h:
             triples.append((key, "label", _norm(h["label"])))
         if "role" in h and h["role"]:

@@ -26,6 +26,23 @@ EXAMPLES = Path(__file__).with_name("examples") / "api_examples.json"
 app = FastAPI(title=f"api-decoy-{DECOY_IP}")
 _examples = json.loads(EXAMPLES.read_text()) if EXAMPLES.exists() else []
 
+# Only plausible API paths reach the LLM. Service scanners (nmap -sV) fire dozens
+# of junk probes (/HNAP1, /evox/about, /sdk, /nmaplowercheck..., random paths);
+# a real service answers those with an instant 404, and LLM-answering each one
+# would make every run crawl. Fast-path anything that doesn't look like a real
+# endpoint to a static 404 — no engine/LLM call.
+_PLAUSIBLE_PREFIXES = (
+    "/api", "/v1", "/v2", "/health", "/metrics", "/status", "/login", "/admin",
+    "/repos", "/repo", "/vault", "/srv", "/secrets", "/.git", "/user", "/version",
+)
+
+
+def _is_plausible(path: str) -> bool:
+    p = path.lower().rstrip("/")
+    if p in ("", "/"):
+        return True
+    return any(p.startswith(pre) for pre in _PLAUSIBLE_PREFIXES)
+
 
 def _retrieve(path: str) -> dict | None:
     """Trivial cosine-free retrieval: exact path, else longest shared prefix."""
@@ -44,6 +61,8 @@ def _retrieve(path: str) -> dict | None:
                methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def catch_all(full_path: str, request: Request):
     path = "/" + full_path
+    if not _is_plausible(path):
+        return JSONResponse({"error": "not found", "path": path}, status_code=404)
     hint = _retrieve(path)
     req_desc = f"{request.method} {path}"
     if hint is not None:

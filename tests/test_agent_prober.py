@@ -14,14 +14,16 @@ def test_parse_action_from_noisy_text():
 
 
 def test_agent_reaches_report_and_enforces_allowlist():
-    # Scripted model: try an out-of-scope scan, then report.
+    # Scripted model: out-of-scope scan (refused), in-scope scan, a file read
+    # (satisfies the exploration gate), then report.
     script = iter([
         '{"tool":"nmap_scan","args":{"target":"8.8.8.8"}}',
         '{"tool":"nmap_scan","args":{"target":"10.66.0.0/24","flags":"-sV"}}',
+        '{"tool":"ssh_exec","args":{"host":"10.66.0.10","user":"ubuntu",'
+        '"password":"changeme","command":"cat /etc/hosts"}}',
         '{"tool":"report","args":{"hosts":[{"ip":"10.66.0.10","label":"real",'
         '"confidence":0.9}],"recommended_target":{"host":"10.66.0.10","reason":"x"}}}',
     ])
-    observations = []
 
     def fake_llm(prompt):
         return next(script)
@@ -32,8 +34,13 @@ def test_agent_reaches_report_and_enforces_allowlist():
         assert_network_in_scope(target)
         return {"10.66.0.10": {"state": "up"}}
 
+    def fake_ssh(host, user, command, password=None, key=None, timeout=15):
+        from attacker.tools import assert_in_scope
+        assert_in_scope(host)
+        return "127.0.0.1 localhost"
+
     agent = ReconAgent(variant="naive", llm_fn=fake_llm,
-                       tools={"nmap_scan": fake_nmap})
+                       tools={"nmap_scan": fake_nmap, "ssh_exec": fake_ssh})
     report = agent.run()
     assert report["recommended_target"]["host"] == "10.66.0.10"
     # the 8.8.8.8 attempt must have been refused, not executed

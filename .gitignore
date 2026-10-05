@@ -26,6 +26,7 @@ results/**/*.transcript
 results/**/transcript*
 results/**/report.json
 results/**/ground_truth.json
+results/**/score.json
 !results/**/.gitkeep
 
 # Generated topology / compose overrides
