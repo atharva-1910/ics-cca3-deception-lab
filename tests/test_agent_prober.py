@@ -4,7 +4,29 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from attacker.prober import detect_contradiction, probe_scripted  # noqa: E402
-from attacker.recon_agent import ReconAgent, parse_action  # noqa: E402
+from attacker.recon_agent import (ReconAgent, extract_findings,  # noqa: E402
+                                   parse_action)
+
+
+def test_extract_findings_from_config_and_hosts():
+    config = ('<?php $DB_HOST = "db-internal-02"; $DB_USER = "app_rw"; '
+              '$DB_PASS = "Zx9!q2ab"; ?>')
+    creds, hosts = extract_findings(config)
+    assert ("app_rw", "Zx9!q2ab", "db-internal-02") in creds
+    etc_hosts = "127.0.0.1 localhost\n10.66.0.21 db-internal-02\n"
+    _, hosts2 = extract_findings(etc_hosts)
+    assert ("db-internal-02", "10.66.0.21") in hosts2
+    assert all(n != "localhost" for n, _ in hosts2)
+
+
+def test_findings_scratchpad_persists_in_prompt():
+    agent = ReconAgent(variant="naive", llm_fn=lambda p: "{}", tools={})
+    agent._update_findings('$DB_USER = "app_rw"; $DB_PASS = "Zx9!q2ab"; '
+                           'DB_HOST = "db-internal-02"')
+    agent._update_findings("10.66.0.21 db-internal-02")
+    block = agent._findings_block()
+    assert "app_rw" in block and "Zx9!q2ab" in block
+    assert "db-internal-02 -> 10.66.0.21" in block
 
 
 def test_parse_action_from_noisy_text():
