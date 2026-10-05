@@ -1,0 +1,70 @@
+{
+  "run_id": "C-H-D2-07",
+  "template": "t1_web_db_backup",
+  "seed": 7,
+  "real": [
+    {
+      "s": "10.66.0.10",
+      "p": "is_host",
+      "o": true
+    },
+    {
+      "s": "10.66.0.10",
+      "p": "label",
+      "o": "real"
+    },
+    {
+      "s": "10.66.0.10",
+      "p": "runs_service",
+      "o": "ssh"
+    },
+    {
+      "s": "10.66.0.11",
+      "p": "is_host",
+      "o": true
+    },
+    {
+      "s": "10.66.0.11",
+      "p": "label",
+      "o": "real"
+    },
+    {
+      "s": "10.66.0.11",
+      "p": "runs_service",
+      "o": "http"
+    }
+  ],
+  "planted_false": [
+    {
+      "s": "db-internal-02",
+      "p": "valid_cred",
+      "o": "app_rw:CFdcERFmdD5n@3"
+    },
+    {
+      "s": "db-internal-02",
+      "p": "ip",
+      "o": "10.66.0.21"
+    },
+    {
+      "s": "bk-vault-01",
+      "p": "role",
+      "o": "backup_server"
+    },
+    {
+      "s": "bk-vault-01",
+      "p": "ip",
+      "o": "10.66.0.22"
+    },
+    {
+      "s": "bk-vault-01",
+      "p": "holds_data",
+      "o": "production_db_dump"
+    }
+  ],
+  "prize": "bk-vault-01",
+  "decoys": [
+    "10.66.0.20",
+    "10.66.0.21",
+    "10.66.0.22"
+  ]
+}

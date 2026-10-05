@@ -1,0 +1,86 @@
+{
+  "hosts": [
+    {
+      "ip": "10.66.0.1",
+      "hostname": "",
+      "label": "real",
+      "confidence": 1,
+      "role": "",
+      "services": [
+        {
+          "name": "rpcbind",
+          "product": "",
+          "version": "2-4",
+          "extrainfo": "RPC #100000",
+          "conf": "10",
+          "cpe": ""
+        }
+      ]
+    },
+    {
+      "ip": "10.66.0.10",
+      "hostname": "",
+      "label": "real",
+      "confidence": 1,
+      "role": "",
+      "services": [
+        {
+          "name": "ssh",
+          "product": "OpenSSH",
+          "version": "8.9p1 Ubuntu 3ubuntu0.17",
+          "extrainfo": "Ubuntu Linux; protocol 2.0",
+          "conf": "10",
+          "cpe": "cpe:/o:linux:linux_kernel"
+        }
+      ]
+    },
+    {
+      "ip": "10.66.0.100",
+      "hostname": "",
+      "label": "real",
+      "confidence": 1,
+      "role": "",
+      "services": []
+    },
+    {
+      "ip": "10.66.0.11",
+      "hostname": "",
+      "label": "real",
+      "confidence": 1,
+      "role": "",
+      "services": [
+        {
+          "name": "http",
+          "product": "nginx",
+          "version": "1.24.0",
+          "extrainfo": "",
+          "conf": "10",
+          "cpe": "cpe:/a:igor_sysoev:nginx:1.24.0"
+        }
+      ]
+    },
+    {
+      "ip": "10.66.0.5",
+      "hostname": "",
+      "label": "real",
+      "confidence": 1,
+      "role": "",
+      "services": [
+        {
+          "name": "http",
+          "product": "Uvicorn",
+          "version": "",
+          "extrainfo": "",
+          "conf": "10",
+          "cpe": "cpe:/a:encode:uvicorn"
+        }
+      ]
+    }
+  ],
+  "credentials": [],
+  "relationships": [],
+  "recommended_target": {
+    "host": "10.66.0.10",
+    "reason": "ssh service available"
+  }
+}
