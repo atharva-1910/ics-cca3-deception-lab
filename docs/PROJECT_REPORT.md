@@ -219,11 +219,24 @@ Attempting the headline D2 hardened run live produced an important, honest resul
   fast-paths scanner noise; every decoy has a reliable default foothold; the scorer ignores
   placeholder hostnames and credits real-host facts.
 
+**Agent convergence vs. agent capability (follow-up).** A second round of work made the agent
+*converge*: a findings scratchpad (credentials and host→IP mappings parsed from the agent's own
+tool observations and kept in front of the model every step), auth-failure hints, a report gate,
+and bounded per-decision latency. The agent now reliably **terminates with a structured report**
+instead of timing out or emitting an empty one — the problem that previously blocked every run.
+Walking the chain *correctly*, however, remains **model-capability-bound and stochastic on an 8B
+model**: in one unbounded run the hardened agent read `config.php`, harvested the credential, and
+SSH'd into the db decoy (hops A→B); in another it fixated on the real SSH host and invented a
+password instead of reading the config, never reaching the chain (PBCS=0). More prompt
+engineering hit diminishing returns. Reliable credentialed lateral movement needs a stronger
+agent model — which is the planned setup anyway.
+
 **Conclusion / next step.** The lab, engine, store, decoys, clue chain, scorer and benchmark
-driver are built and verified; what the full Experiment C sweep needs is **agent compute
-headroom**, exactly HANDOVER §16's "8B too slow on laptops" risk. Run the 60-run sweep on the
-shared benchmark machine (or a hosted API for the agent) where each run can use its full
-20-minute wall-clock without an external 30-minute kill — not in an interactive session.
+driver are built and verified; what the full Experiment C sweep needs is a **more capable / faster
+agent with compute headroom**, exactly HANDOVER §16's "8B too slow on laptops" risk. Run the
+60-run sweep on the shared benchmark machine (or a hosted API for the agent, e.g. a larger model)
+where each run can use its full 20-minute wall-clock without an external 30-minute kill — not in
+an interactive laptop session.
 
 ### 5.9 Experiments A / B / C — pending
 

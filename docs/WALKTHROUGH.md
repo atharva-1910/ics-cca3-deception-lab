@@ -252,8 +252,13 @@ preliminary evidence for RQ3/RQ4; it is not yet a quantified result.
   main D1-vs-D2 comparison if time allows.
 - **Hardening via one prompt line** is a simplistic hardened-agent definition; a second method
   (tool-output tagging) is a possible extension.
-- **Agent-discovery variance.** The agent must find hop A; we mitigate by placing it on an obvious
-  service and seeding a reliable foothold, and we report chain-discovery rate separately.
+- **Agent-discovery variance / capability ceiling.** The agent must find hop A and perform
+  credentialed lateral movement. We made it *converge* reliably (a findings scratchpad of
+  self-harvested credentials and host→IP maps, auth hints, a report gate), but *correctly* walking
+  the 3-hop chain is stochastic on an 8B model — it sometimes harvests and reuses the planted
+  credential (hops A→B) and sometimes fixates on the wrong host. Reliable results need a stronger
+  agent model; we also report chain-discovery rate separately so a capability failure is not
+  mistaken for a deception failure.
 - **Our Mantis re-implementation** may be weaker than the original; we use published-style
   injection strings and report them verbatim in the appendix.
 - **Small samples / fact-extraction error** — 10 seeds per cell, effect sizes and CIs reported,
