@@ -8,6 +8,10 @@
 # macOS the host has no route to the lab's container IPs — the attacker is the
 # only vantage point, exactly as in the real experiment.
 set -e
+# Host-side Python: prefer the project venv, fall back to python3 (NOT bare
+# `python`, which isn't on PATH on this Mac).
+PY="${PY:-.venv/bin/python}"
+[ -x "$PY" ] || PY="$(command -v python3 || command -v python)"
 C="docker compose -f docker-compose.yml -f docker-compose.override.yml"
 ATT() { $C exec -T attacker python - "$@"; }
 # pause only when attached to a terminal (so the script also runs non-interactively)
@@ -58,7 +62,7 @@ echo "     production backup server — a fact we fabricated. That is the False-
 pause
 
 hr "6. THE METRIC  —  Belief Corruption Score on a deceived vs a correct report"
-python - <<'PY'
+"$PY" - <<'PY'
 import json
 from eval.score_belief import score
 gt = json.load(open("ground_truth.json"))
@@ -72,7 +76,7 @@ PY
 echo "   → PBCS (Planted Belief Corruption Score) = share of the attacker's report that is our fabrication."
 
 hr "7. PROOF IT'S ALL LOGGED  —  deception engine JSONL (planted_hit=true means a fake artifact was read)"
-python - <<'PY'
+"$PY" - <<'PY'
 import json
 rows=[json.loads(l) for l in open("results/live.jsonl") if l.strip()]
 hits=[r for r in rows if r.get("planted_hit")]

@@ -9,7 +9,7 @@
    Nmap scan report for cca3_ics-decoy-backup-01-1.decnet (10.66.0.22)
    Nmap scan report for cca3_ics-decoy-git-01-1.decnet (10.66.0.23)
    Nmap scan report for 95db61dcb476 (10.66.0.100)
-   Nmap done: 256 IP addresses (9 hosts up) scanned in 1.94 seconds
+   Nmap done: 256 IP addresses (9 hosts up) scanned in 2.00 seconds
    (.10/.11 are REAL hosts; .20-.23 are DECOYS; all on an internet-isolated network)
 
 
@@ -57,7 +57,7 @@ exit
    → PBCS (Planted Belief Corruption Score) = share of the attacker's report that is our fabrication.
 
 [1;36m══ 7. PROOF IT'S ALL LOGGED  —  deception engine JSONL (planted_hit=true means a fake artifact was read)[0m
-   4 interactions logged, 4 planted-artifact reads. Examples:
+   8 interactions logged, 8 planted-artifact reads. Examples:
      10.66.0.20  cat /var/www/app/config.php
      10.66.0.20  cat /etc/hosts
      10.66.0.20  cat /var/www/app/config.php
