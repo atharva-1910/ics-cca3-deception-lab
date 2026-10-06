@@ -13,6 +13,7 @@ is false (**Belief Corruption Score**).
 - [`docs/WALKTHROUGH.md`](docs/WALKTHROUGH.md) — master walkthrough: methodology, what's under test, contributions, results (survey perspective).
 - [`docs/SLIDES.md`](docs/SLIDES.md) — ready-to-build presentation deck (~12 slides with speaker notes).
 - [`docs/TECH_STACK.md`](docs/TECH_STACK.md) — every tool and why we chose it (good for the viva).
+- [`docs/RESULTS.md`](docs/RESULTS.md) — measures, numbers and performance metrics (what's measured vs pending).
 
 Demo: run `make demo` (lab must be up). Full spec: [`HANDOVER.md`](HANDOVER.md). Machine
 setup & safety: [`CLAUDE.md`](CLAUDE.md). Engineering status & raw results:
