@@ -201,6 +201,13 @@ to end on macOS/Apple Silicon (the handover assumed Windows/WSL2; see CLAUDE.md 
    on a correct one, with chain depth, prize adoption and real-target exposure.
 6. **A released, reproducible benchmark** — lab, scripts, metric definitions and a one-command
    sweep — which is itself one of the survey's identified gaps.
+7. **Credential isolation — real assets stay unreachable.** Every credential the attacker can
+   harvest is a planted fake that opens a *decoy*; the real hosts' passwords are never exposed.
+   Verified live (`make prove-isolation`): the default login and the harvested chain credential
+   are **rejected** on the real host `10.66.0.10` but **accepted** on the decoys. The clue chain
+   never names a real host (non-interference), so the trail leads away from real assets, and the
+   agent's recommended target in the pilot was a decoy (real-target exposure = 0). Access control
+   guards the data; deception makes the attacker's whole picture wrong.
 
 ---
 

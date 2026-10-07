@@ -69,6 +69,9 @@ Companion reading: [`EXPLAIN_LIKE_IM_15.md`](EXPLAIN_LIKE_IM_15.md) (plain intui
 ## Slide 8 — LIVE DEMO  ▶
 - Switch to the terminal: `make demo` (7 beats).
 - Point out: the **working credential** (beat 4) and **PBCS = 0.67 vs 0** (beat 6).
+- *Optional second beat:* `make prove-isolation` — shows the harvested fake credential is
+  **rejected on the real host** but accepted on the decoys (answers "how do real hosts stay
+  safe?").
 - *Fallback:* the captured run in `results/demo_transcript.txt`.
 - *Say, closing the demo:* "Every clue checked out, so a fully-deceived report is
   two-thirds our fabrication — and we never gave it a single instruction."
@@ -114,6 +117,9 @@ Companion reading: [`EXPLAIN_LIKE_IM_15.md`](EXPLAIN_LIKE_IM_15.md) (plain intui
 - If asked "does the AI get fooled fully automatically?" → *"It harvests and reuses the
   planted credential; full 3-hop autonomy needs a bigger model — that's the documented
   next step."* Don't live-run the agent.
+- If asked "how do real hosts stay safe / can't it steal the real data?" → *"The only
+  credentials it can harvest are planted fakes that open decoys, not real hosts — the real
+  passwords are never exposed. We prove it with `make prove-isolation`."*
 - Keep the one-liner handy: *"Unlike engagement-based honeypots and injection-based
   defenses, we target the AI attacker's world model with consistent cross-host facts,
   and we measure the result."*

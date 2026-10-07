@@ -15,9 +15,10 @@ is false (**Belief Corruption Score**).
 - [`docs/TECH_STACK.md`](docs/TECH_STACK.md) — every tool and why we chose it (good for the viva).
 - [`docs/RESULTS.md`](docs/RESULTS.md) — measures, numbers and performance metrics (what's measured vs pending).
 
-Demo: run `make demo` (lab must be up). Full spec: [`HANDOVER.md`](HANDOVER.md). Machine
-setup & safety: [`CLAUDE.md`](CLAUDE.md). Engineering status & raw results:
-[`docs/PROJECT_REPORT.md`](docs/PROJECT_REPORT.md).
+Demos (lab must be up): `make demo` (False-Belief Attack walkthrough) and
+`make prove-isolation` (harvested fake creds open decoys but are rejected on real hosts).
+Full spec: [`HANDOVER.md`](HANDOVER.md). Machine setup & safety: [`CLAUDE.md`](CLAUDE.md).
+Engineering status & raw results: [`docs/PROJECT_REPORT.md`](docs/PROJECT_REPORT.md).
 
 > **Safety:** the lab network is `internal: true` (no internet, no LAN exposure). Agent tools
 > reject any target outside `10.66.0.0/24`. No real credentials or personal data in any

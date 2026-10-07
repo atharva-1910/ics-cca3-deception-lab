@@ -54,6 +54,12 @@ demo:            ## live False-Belief Attack walkthrough (lab must be up; fresh 
 	$(COMPOSE) restart orchestrator && sleep 3
 	./demo.sh
 
+prove-isolation: ## prove harvested fake creds open decoys but are REJECTED on real hosts
+	$(PY) store/seed.py --snapshot base
+	$(PY) narrative/generator.py --template t1 --seed 7 --run-id ISO
+	$(COMPOSE) restart orchestrator && sleep 3
+	./prove_isolation.sh
+
 agent:           ## run one agent manually (VARIANT=naive DEFENSE=D2 SEED=7)
 	$(PY) attacker/recon_agent.py --variant $(or $(VARIANT),naive) \
 		--defense $(or $(DEFENSE),D2) --seed $(or $(SEED),7) --run-id manual

@@ -113,6 +113,34 @@ PBCS, the headline, is unaffected and correctly 0.
 
 ---
 
+## 4a. Does the intruder ever reach the real hosts' data? — verified NO
+
+The real hosts stay protected because **every credential an attacker can harvest is a
+planted fake that opens a decoy, never a real host** — the real hosts' passwords are never
+written in any file, config, or decoy. Proven live (`make prove-isolation`):
+
+| Target | Credential tried | Source | Outcome |
+|--------|------------------|--------|---------|
+| **REAL** `10.66.0.10` | `ubuntu / changeme` | default lab login | **REJECTED** |
+| **REAL** `10.66.0.10` | `app_rw / <harvested>` | harvested from the decoy chain | **REJECTED** |
+| DECOY `10.66.0.20` | `ubuntu / changeme` | default lab login | access granted |
+| DECOY `10.66.0.21` | `app_rw / <harvested>` | harvested from the decoy chain | access granted |
+
+Why this holds:
+- The attacker can only *use* credentials it *finds*, and the only readable credential
+  artifacts are the fakes **we planted on decoys**.
+- Those fakes are registered only in the decoys' consistency store, so they authenticate on
+  decoys but not on the real host, which checks its own (unexposed) password.
+- **Non-interference:** the clue chain never names a real host — verified: planted facts that
+  reference a real host = **NONE**. The trail always leads *away* from real assets, into decoys.
+- Complementary measure: **real-target exposure** (does the agent's final recommendation point
+  at a real host?) was **0** in the pilot — the agent recommended a *decoy*.
+
+*Scope note:* deception is not an access-control lock — real-host data is guarded by
+authentication (and, in production, firewalls/least-privilege/EDR); deception adds
+misdirection, wasted attacker effort, a decoy tripwire, and belief corruption on top.
+Reproduce: `make prove-isolation`.
+
 ## 5. Experiment results tables — status: PENDING (needs un-capped agent compute)
 
 The harness and driver exist (`make benchmark`, `make aggregate`); these tables populate

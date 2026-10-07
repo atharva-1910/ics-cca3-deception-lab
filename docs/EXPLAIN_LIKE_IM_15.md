@@ -108,6 +108,30 @@ with the shared memory. It runs **on the laptop** (free, offline, private).
    our fabrication); a correct report scores **0**.
 7. **Proof** — the log shows every fake file the robot read.
 
+## 7½. "But can't the robot just break into the REAL computers?"
+
+Great question — and the answer is a clean trick. **The only keys the robot can ever pick up
+are fake keys we planted, and fake keys only open fake doors.**
+
+- The robot can only *use* a password if it *finds* it. The only passwords lying around are the
+  fake ones we planted on the decoys (in `config.php`, command history, etc.).
+- Those fake passwords are registered **only with the decoys**, so they work on the fake
+  machines — but the **real** machine has its own real password that we **never write down
+  anywhere**. So when the robot tries its stolen fake key on the real machine, the door stays
+  shut.
+- And the treasure map never points at a real machine anyway — every clue leads to another
+  decoy. So the robot is always walking *away* from the real stuff.
+
+We can prove this live in one command (`make prove-isolation`): the stolen keys open the
+decoys but are **rejected** on the real machine. (And in our lab the real machines are empty
+anyway — there's literally nothing to steal.)
+
+One honest note: this isn't a magic forcefield. If the robot *already had* a real password
+(stolen from somewhere else), it could get in — that's what normal security (passwords,
+firewalls) is for. Our deception doesn't replace those; it sits on top and makes the robot
+**waste its time on fakes, draw the wrong conclusions, and trip our alarm** the moment it
+touches a decoy.
+
 ## 8. Why it's safe (say this if asked)
 
 Everything runs in a **sealed sandbox**: the fake network has **no connection to the
